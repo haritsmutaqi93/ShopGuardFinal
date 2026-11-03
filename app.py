@@ -1,9 +1,12 @@
 """ShopGuard Streamlit entry point."""
 import streamlit as st
+from backend.auth import require_authentication
 from backend.ui import GLOBAL_STYLES
 
 st.set_page_config(page_title="ShopGuard", page_icon="🛡️", layout="wide")
-st.markdown(GLOBAL_STYLES + """
+st.markdown(GLOBAL_STYLES, unsafe_allow_html=True)
+require_authentication()
+st.markdown("""
 <style>
 [data-testid="stMainBlockContainer"] { max-width: 980px; padding-top: 2.5rem; }
 .hero { padding: 2rem 2.25rem; background: linear-gradient(120deg, #0b2f55, #1d6eae); border-radius: 16px; margin-bottom: 1.75rem; }

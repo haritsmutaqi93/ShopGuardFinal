@@ -5,6 +5,7 @@ import streamlit as st
 
 from database.repository import ShopGuardRepository
 from database.supabase_client import SupabaseConfigurationError
+from backend.auth import require_authentication
 
 
 GLOBAL_STYLES = """
@@ -115,6 +116,7 @@ button, [role="button"], a { color: inherit; }
 def configure_page(title: str) -> None:
     st.set_page_config(page_title=f"ShopGuard | {title}", page_icon="🛡️", layout="wide")
     st.markdown(GLOBAL_STYLES, unsafe_allow_html=True)
+    require_authentication()
     st.title(f"🛡️ {title}")
 
 
