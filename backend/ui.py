@@ -10,13 +10,12 @@ from backend.auth import require_authentication
 
 GLOBAL_STYLES = """
 <style>
-/* A deliberate light palette prevents theme/browser defaults from lowering contrast. */
+/* Keep Streamlit's controls in a predictable, high-contrast light palette. */
 :root { color-scheme: light; }
 .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
     background: #f4f7fb !important;
     color: #172b4d !important;
 }
-[data-testid="stAppViewContainer"] * { color: #172b4d; }
 [data-testid="stSidebar"], [data-testid="stSidebar"] > div {
     background: #ffffff !important;
     color: #172b4d !important;
@@ -25,6 +24,9 @@ GLOBAL_STYLES = """
 h1, h2, h3, .stHeading, label, p, li, small, [data-testid="stCaptionContainer"],
 [data-testid="stWidgetLabel"] p, [data-testid="stMarkdownContainer"] p {
     color: #172b4d !important;
+}
+[data-testid="stWidgetLabel"] p, label {
+    font-weight: 600 !important;
 }
 [data-testid="stMetric"], [data-testid="stDataFrame"], [data-testid="stExpander"],
 [data-testid="stFileUploader"], [data-testid="stVerticalBlockBorderWrapper"] {
@@ -36,7 +38,6 @@ h1, h2, h3, .stHeading, label, p, li, small, [data-testid="stCaptionContainer"],
     border: 2px dashed #5b82aa !important;
     border-radius: 10px !important;
 }
-[data-testid="stFileUploaderDropzone"] *,
 [data-testid="stFileUploaderDropzone"] span,
 [data-testid="stFileUploaderDropzone"] small,
 [data-testid="stFileUploaderDropzone"] p {
@@ -47,32 +48,84 @@ h1, h2, h3, .stHeading, label, p, li, small, [data-testid="stCaptionContainer"],
     color: #145da0 !important;
     stroke: #145da0 !important;
 }
-[data-testid="stFileUploaderDropzone"] button {
+[data-testid="stFileUploaderDropzone"] button,
+[data-testid="stFileUploader"] button {
     background: #e7f0fa !important;
     border: 1px solid #145da0 !important;
     color: #0c477e !important;
     font-weight: 700 !important;
 }
-[data-testid="stFileUploaderDropzone"] button:hover {
+[data-testid="stFileUploaderDropzone"] button:hover,
+[data-testid="stFileUploader"] button:hover {
     background: #d4e7f8 !important;
     color: #083863 !important;
 }
 [data-testid="stMetric"] { border: 1px solid #c9d7e7; border-radius: 10px; padding: 12px; }
 [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color: #102a43 !important; }
-input, textarea, [data-baseweb="select"] input, [data-baseweb="select"] div {
+/* Text fields: never inherit the application background or page text colour. */
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-baseweb="input"] input {
     color: #172b4d !important;
     background: #ffffff !important;
+    caret-color: #145da0 !important;
 }
-input::placeholder, textarea::placeholder { color: #52677f !important; opacity: 1 !important; }
-[data-baseweb="select"] > div, [data-baseweb="input"] > div {
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder,
+[data-baseweb="input"] input::placeholder {
+    color: #52677f !important;
+    opacity: 1 !important;
+}
+[data-testid="stTextInput"] [data-baseweb="input"] > div,
+[data-testid="stTextArea"] [data-baseweb="textarea"],
+[data-baseweb="select"] > div {
     background: #ffffff !important;
-    border-color: #8ca4bd !important;
+    border-color: #7893ae !important;
+}
+[data-testid="stTextInput"] [data-baseweb="input"] > div:focus-within,
+[data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+[data-baseweb="select"] > div:focus-within {
+    border-color: #145da0 !important;
+    box-shadow: 0 0 0 2px rgba(20, 93, 160, 0.22) !important;
+}
+/* Select options render in a BaseWeb popover outside the closed select's DOM. */
+[data-baseweb="popover"],
+[role="listbox"] {
+    background: #ffffff !important;
+    color: #172b4d !important;
+    border: 1px solid #7893ae !important;
+    box-shadow: 0 6px 18px rgba(20, 60, 100, 0.18) !important;
+}
+[role="option"],
+[role="listbox"] li,
+[data-baseweb="menu"] [role="option"] {
+    background: #ffffff !important;
+    color: #172b4d !important;
+}
+[role="option"] *,
+[role="listbox"] li *,
+[data-baseweb="menu"] [role="option"] * {
+    color: #172b4d !important;
+}
+[role="option"]:hover,
+[role="option"][aria-selected="true"],
+[role="option"][aria-selected="true"] *,
+[role="option"][data-highlighted="true"],
+[role="option"][data-highlighted="true"] * {
+    background: #e7f0fa !important;
+    color: #0c477e !important;
+}
+[data-baseweb="select"] input {
+    color: #172b4d !important;
 }
 .stButton > button, .stDownloadButton > button, [data-testid="stFormSubmitButton"] > button {
     color: #ffffff !important;
     background: #145da0 !important;
     border: 1px solid #0c477e !important;
     font-weight: 700 !important;
+}
+.stButton > button *, .stDownloadButton > button *, [data-testid="stFormSubmitButton"] > button * {
+    color: #ffffff !important;
 }
 .stButton > button:hover, .stDownloadButton > button:hover, [data-testid="stFormSubmitButton"] > button:hover {
     background: #0c477e !important;
@@ -108,7 +161,9 @@ input::placeholder, textarea::placeholder { color: #52677f !important; opacity: 
 .stButton > button:disabled { background: #9aaabd !important; color: #ffffff !important; opacity: 1 !important; }
 [data-testid="stAlert"] { border-width: 1px !important; }
 [data-testid="stAlert"] p, [data-testid="stAlert"] div { color: #102a43 !important; font-weight: 500; }
-button, [role="button"], a { color: inherit; }
+[data-testid="stAlert"][data-baseweb="notification"][kind="positive"] { background: #e8f5ed !important; }
+[data-testid="stAlert"][data-baseweb="notification"][kind="warning"] { background: #fff7e5 !important; }
+[data-testid="stAlert"][data-baseweb="notification"][kind="negative"] { background: #fdecec !important; }
 </style>
 """
 
